@@ -1,0 +1,16 @@
+torch
+flask
+groq
+langchain_community
+langchain
+faiss-cpu
+sentence-transformers
+langchain-huggingface
+langchain_core
+langchain_groq
+pyyaml
+pypdf==5.1.0
+pandas
+Flask-Dance[google]
+Flask-Login
+Flask-Caching

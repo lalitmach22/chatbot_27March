@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alshwin</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+  </head>
+  <body>    
+    <div class="container">
+      <div class="auth-container">
+        <p>Welcome, {{ user_name }}!</p>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+
+      <div id="alert-box" class="alert-box">
+        <div class="alert-content">
+          <span class="close-btn" onclick="closeAlert()">&times;</span>
+          <h2>Welcome to Alshwin</h2>
+          <p>Your personalized AI-Driven Bot to help you with your BDM Project Queries. Example prompts:</p>
+          <ul>
+            <li>What are the rubrics to submit project proposal for BDM Project?</li>
+            <li>How to formulate the title for my BDM Project?</li>
+            <li>What are the rubrics for submitting the final submission for my BDM project?</li>
+            <li>What do we have to submit in the metadata and descriptive statistics?</li>
+            <li>What is Metadata in Mid Term Submission?</li>
+          </ul>
+          <button onclick="closeAlert()">Let's Dive In</button>
+        </div>
+      </div>
+
+      <h1>Alshwin</h1>
+      <div id="chat-box"></div>
+      <div class="input-container">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Type your message here..."
+          autofocus
+        />
+        <button id="send-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const chatBox = document.getElementById("chat-box");
+      const userInput = document.getElementById("user-input");
+      const sendBtn = document.getElementById("send-btn");
+
+      function closeAlert() {
+        document.getElementById('alert-box').style.display = 'none';
+      }
+
+      function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+        chatBox.innerHTML += `<div class="message user">${message}</div>`;
+        userInput.value = "";
+
+        fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const botMessage = data.response;
+            const renderedMessage = DOMPurify.sanitize(marked.parse(botMessage));
+            chatBox.innerHTML += `<div class="message bot">${renderedMessage}</div>`;
+            if (data.stop) {
+              chatBox.innerHTML += `<div class="message bot">Chat ended.</div>`;
+              userInput.disabled = true;
+              sendBtn.disabled = true;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+      sendBtn.addEventListener("click", sendMessage);
+      userInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+    </script>
+  </body>
+</html>
