@@ -30,7 +30,7 @@ Alshwin is a personalized AI-driven bot designed to assist with queries related 
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/brpuneet898/bdm-project-flask.git
+    git clone https://github.com/lalitmach22/chatbot_27March
     cd alshwin
     ```
 
@@ -109,3 +109,44 @@ Currently, we are not accepting any contributions.
 ## Contact
 
 For any questions or inquiries, please contact [Lalit](21f3001013@ds.study.iitm.ac.in).
+
+For using this in offline mode (without internet) 
+1. Add Required Packages to requirements.txt
+
+
+To run the application offline, ensure you have the following packages in your `requirements.txt` file:
+```plaintext
+flask
+torch
+transformers
+sentence-transformers
+faiss-cpu
+numpy
+If you have a GPU, replace faiss-cpu with faiss-gpu.
+
+Ensure torch is added with the correct version for your hardware (CUDA or CPU).
+
+2. Pre-Download Models for Offline Use
+You can pre-download the models and store them locally:
+
+For SentenceTransformer (MiniLM-L6-v2):
+
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+model.save('models/all-MiniLM-L6-v2')
+For Mistral-7B-Instruct:
+
+from transformers import AutoModelForCausalLM, AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained('mistralai/Mistral-7B-Instruct-v0.1')
+tokenizer.save_pretrained('models/Mistral-7B-Instruct-v0.1')
+model = AutoModelForCausalLM.from_pretrained('mistralai/Mistral-7B-Instruct-v0.1')
+model.save_pretrained('models/Mistral-7B-Instruct-v0.1')
+3. Update Your Code to Load Models from Local Path
+Modify your code to load the models from the downloaded directory:
+
+
+embedding_model = SentenceTransformer('models/all-MiniLM-L6-v2')
+tokenizer = AutoTokenizer.from_pretrained('models/Mistral-7B-Instruct-v0.1', local_files_only=True)
+model = AutoModelForCausalLM.from_pretrained('models/Mistral-7B-Instruct-v0.1', device_map='auto', torch_dtype=torch.float16, local_files_only=True)
+
+for offline run offline.py
